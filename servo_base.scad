@@ -29,7 +29,7 @@ use <obiscad/bevel.scad>
 //-- Fake shaft
 fake_shaft = true;   //-- Set to false for removing
 fake_shaft_len = 6;  //-- Shaft length
-fake_shaft_diam = 8;  //-- Shaft diameter
+fake_shaft_diam = 8.2;  //-- Shaft diameter
 fake_shaft_xpos = -10.1;  //-- X coordinate of the shaf position
 
 

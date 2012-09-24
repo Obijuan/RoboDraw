@@ -8,7 +8,7 @@ use <obiscad/attach.scad>
 thickness = 4;
 
 //-- Distance from the servo shaft to the front plate
-u_shaft_front_dist = 20;
+u_shaft_front_dist = 27;
 
 //-- Distance from the servo shaft to the rear  
 u_shaft_rear_dist = 13;
@@ -19,7 +19,7 @@ u_lz = u_shaft_front_dist + u_shaft_rear_dist;
 
 //-- Front plate user params
 //-- Distance between the center and the drills (radius)
-fp_drills_distance = 8;
+fp_drills_distance = 6;
 
 //-- Drills diameter
 fp_drills_diam = 3.2;
