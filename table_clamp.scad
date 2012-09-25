@@ -3,9 +3,12 @@ use <obiscad/bcube.scad>
 use <obiscad/attach.scad>
 use <obiscad/bevel.scad>
 
+servo_wrap_th = 4;
 
 //-- Clamp
-rod_dist = 28;  //-- distance between rods (between the nearer surfaces)
+//-- BUG: there is a bug in the arm calculation of the rod distance. For that
+//-- reason the term servo_wrap_th*2 has to be added
+rod_dist = 28+2*servo_wrap_th;  //-- distance between rods (between the nearer surfaces)
 clamp_drill = 8;
 clamp_nut = 14.6;
 clamp_extra = 1;
@@ -24,8 +27,9 @@ tower_ly = rod_dist + 2*(clamp_drill) + (clamp_nut - clamp_drill) + 2*(clamp_ext
 clamp_body_size = [ tower_lx + clamp_lx, tower_ly, clamp_hi ];
 
 drills_x = clamp_body_size[X]/2 - tower_lx/2;
-pos1 = [drills_x, rod_dist/2, 0];
-pos2 = [drills_x, -rod_dist/2,0];
+drills_y = rod_dist/2 + clamp_drill/2;
+pos1 = [drills_x, drills_y,  0];
+pos2 = [drills_x, -drills_y, 0];
 
 echo("pos1: ",pos1);
 
