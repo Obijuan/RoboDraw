@@ -1,6 +1,7 @@
 include <obiscad/utils.scad>
 use <obiscad/bcube.scad>
 use <obiscad/attach.scad>
+use <lib.scad>
 
 
 //------------------------ Data for the Rod holders
@@ -11,12 +12,19 @@ rod_hold_drill_hi = 11;
 rod_hold_drill_diam = 8.3;
 rod_hold_th = 2;
 
+servo_wrap_th = 4;
+
+//-- Clamp
+//-- BUG: there is a bug in the arm calculation of the rod distance. For that
+//-- reason the term servo_wrap_th*2 has to be added
+rod_dist = 28+2*servo_wrap_th;  //-- distance between rods (between the nearer surfaces)
+
 //-- Data for the skymega
 
-skymega_size = [52, 52, 3];
-skymega_cr = 3;
-skymega_cres = 5;
-skymega_drill_diam=3.2;
+base_size = [52, rod_dist+2*rod_hold_drill_diam+2*rod_hold_th, 3];
+base_cr = 3;
+base_cres = 5;
+base_drill_diam=3.2;
 
 //-- Skymega drills
 dd = 15;
@@ -53,7 +61,8 @@ module rod_holder()
    //-- Big drill
    translate([0,0,rod_holder_size[Z]/2])
     rotate([0,90,0])
-      cylinder(r=rod_hold_drill_diam/2, h=rod_holder_size[X]+extra, center=true, $fn=20);
+      //cylinder(r=rod_hold_drill_diam/2, h=rod_holder_size[X]+extra, center=true, $fn=20);
+      reprap_drill(r=rod_hold_drill_diam/2, h=rod_holder_size[X]+extra, roll=180);
   }
 
 }
@@ -62,16 +71,16 @@ module rod_holder()
 //-- Build the base
 
 difference() {
-  bcube(skymega_size, cr=skymega_cr, cres=skymega_cres);
+  bcube(base_size, cr=base_cr, cres=base_cres);
 
   for (drill = drill_table) {
     translate(drill)
-      cylinder(r=skymega_drill_diam/2, h=skymega_size[Z]+extra,center=true, $fn=20); 
+      cylinder(r=base_drill_diam/2, h=base_size[Z]+extra,center=true, $fn=20); 
   }
 }
 
-a = [[0, -skymega_size[Y]/2, skymega_size[Z]/2],[0,0,1],0];
-b = [[0, skymega_size[Y]/2, skymega_size[Z]/2],[0,0,1],180];
+a = [[0, -base_size[Y]/2, base_size[Z]/2],[0,0,1],0];
+b = [[0, base_size[Y]/2, base_size[Z]/2],[0,0,1],180];
 
 c = [[0, -rod_holder_size[Y]/2, -rod_holder_size[Z]/2],[0,0,1],0];
 
