@@ -1,10 +1,16 @@
 #include <skymega.h>
+#include <Servo.h>
 
 //-- Define the commands ----------------------
 
 //-- Cmd SERVO1:  Move the servo 1 (first link) to a given angle
 //---- The angle is in degrees (double value)
 #define CMD_SERVO1 'A'
+
+//-- cMD SERVO2: Move the servo 2 (second link) to a given angle
+#define CMD_SERVO2 'B'
+
+Servo servo[2];
 
 void setup()
 {
@@ -13,6 +19,10 @@ void setup()
   
   //-- Configure the serial port
   Serial.begin(9600);
+  
+  //-- Configure the servos
+  servo[0].attach(SERVO2);
+  servo[1].attach(SERVO4);
   
   delay(500); 
   digitalWrite(LED, ON);   // set the LED on
@@ -31,6 +41,7 @@ bool cmd_ready=false;
 
 //-- Servo 1 angle
 float ang1=0;
+float ang2=0;
 
 void loop()
 {
@@ -88,12 +99,33 @@ void process_cmd()
       //-- Get the angular value
       ang1 = strtod(&buffer[1],NULL);
       
+      servo[0].write(ang1 + 90.0);
+      
       //-- Debug!
       Serial.print("Servo 1: ");
       Serial.print(ang1);
       Serial.print("\n");
       break;
+      
+    case CMD_SERVO2: 
+      //-- Get the angular value
+      ang2 = strtod(&buffer[1],NULL);
+      
+      servo[1].write(ang2 + 90.0);
+      
+      //-- Debug!
+      Serial.print("Servo 2: ");
+      Serial.print(ang2);
+      Serial.print("\n");
+      break;  
   }
   
 }
+
+
+
+
+
+
+
 
