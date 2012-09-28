@@ -1,5 +1,5 @@
 #include <skymega.h>
-#include <Servo.h>
+#include <VarSpeedServo.h>
 
 //-- Define the commands ----------------------
 
@@ -7,10 +7,13 @@
 //---- The angle is in degrees (double value)
 #define CMD_SERVO1 'A'
 
-//-- cMD SERVO2: Move the servo 2 (second link) to a given angle
+//-- Cmd SERVO2: Move the servo 2 (second link) to a given angle
 #define CMD_SERVO2 'B'
 
-Servo servo[2];
+//-- Cmd Velocity: change the current servo speed
+#define CMD_SPEED 'V'
+
+VarSpeedServo servo[2];
 
 void setup()
 {
@@ -42,6 +45,7 @@ bool cmd_ready=false;
 //-- Servo 1 angle
 float ang1=0;
 float ang2=0;
+int speed = 50;
 
 void loop()
 {
@@ -99,7 +103,7 @@ void process_cmd()
       //-- Get the angular value
       ang1 = strtod(&buffer[1],NULL);
       
-      servo[0].write(ang1 + 90.0);
+      servo[0].slowmove(ang1 + 90.0, speed);
       
       //-- Debug!
       Serial.print("Servo 1: ");
@@ -111,13 +115,23 @@ void process_cmd()
       //-- Get the angular value
       ang2 = strtod(&buffer[1],NULL);
       
-      servo[1].write(ang2 + 90.0);
+      servo[1].slowmove(ang2 + 90.0, speed);
       
       //-- Debug!
       Serial.print("Servo 2: ");
       Serial.print(ang2);
       Serial.print("\n");
       break;  
+      
+    case CMD_SPEED: 
+      //-- Get the angular value
+      speed = strtod(&buffer[1],NULL);
+      
+      //-- Debug!
+      Serial.print("Speed: ");
+      Serial.print(speed);
+      Serial.print("\n");
+      break;   
   }
   
 }
