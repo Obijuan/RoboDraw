@@ -49,6 +49,7 @@ class Robot:
        are returned
        Angles (alpha and beta) are in degrees
     """
+    
     ##--- Alpha is the joint 1 angle, between the y axis and the link 1
     ##-- For the calculations it is better to refer to the x axis
     alpha = alpha + 90.;
@@ -119,5 +120,8 @@ class Robot:
     pylab.ylim([-extra, l+l+extra])
     pylab.xlim([-l-extra, l+extra])
     
+    pylab.xlabel('X (mm)')
+    pylab.ylabel('Y (mm)')
+    pylab.title('RoboDraw Kinematics')
     
     pylab.show();
