@@ -78,12 +78,55 @@ class Robot:
         
       returns: The (x,y) coordinates of the robot end
     """
-    print "Direct kinematics!"
-    
     tmp, O2 = self._kin_calculations(alpha,beta)
     return O2[0], O2[1]
+
+
+  def inverse_kin(self, x, y, decimals=1):
+    """Inverse Kinematics. It returns the angles (in degrees) """
     
-  def draw(self,alpha,beta):
+    #-- x,y are float numbers (just in case)
+    x=float(x)
+    y=float(y)
+    
+    #-- Calculate the anges q1, q2, in radians
+    cq2 = (x**2 + y**2 - self.l1**2 - self.l2**2)/(2*self.l1*self.l2) ;
+    q2 = -math.acos(cq2);
+    
+    if (x==0): 
+      ang = math.pi/2;
+    else:
+      ang = math.atan2(y,x);
+    
+    q1 = ang - math.atan(-self.l2*math.sqrt(1-cq2*cq2)/(self.l1+self.l2*cq2) );
+    
+    #-- Convert the angles to degrees
+    q1 = math.degrees(q1);
+    q2 = math.degrees(q2);
+    
+    #-- Refer the q1 angle to the y axis
+    q1 = q1 - 90;
+    
+    #-- Truncate the angles for having the specified decimals
+    q1 = round(q1, decimals)
+    q2 = round(q2, decimals)
+    
+    #-- Return the angles
+    return q1,q2 
+
+  def display_xy(self, x, y, decimals=1):
+    """Draw the robot from the (x,y) coordinates of the end"""
+    
+    ##-- Calculate the angles
+    q1,q2 = self.inverse_kin(x,y,decimals)
+    
+    #-- Draw the robot
+    self.display(q1,q2);
+    
+    
+  def display(self,alpha,beta):
+    """Draw the robot, from the 2 angles
+    """
     #pylab.ion()
     
      ##-- Definitions for easily accesing the vector coordinates
