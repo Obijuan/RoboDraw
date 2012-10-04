@@ -1,6 +1,8 @@
 import math
 import pylab
 import numpy as np
+import serial
+import time
 
 def Plot_points(lp):
   """Plot a list of points. Each point is a pair (x,y)"""
@@ -52,6 +54,16 @@ class Robot:
     
     #-- The robot origin
     self.origin = np.array([0,0,0,1]);
+    
+    #-- Serial port
+    self.serial=object()
+    
+    #-- Current angular positions
+    self.alpha = 0 #-- Joint 1
+    self.beta = 0  #-- Joint 2
+    
+    #-- Set the default speed
+    self.cspeed = 50;
     
 
   def test(self):
@@ -129,7 +141,69 @@ class Robot:
     
     #-- Return the angles
     return q1,q2
+
+  def connect(self, serial_str):
+    """Open the serial port"""
+    self.serial = serial.Serial(serial_str, 9600) 
+
+  def speed(self,speed):
+    """Set the robot speed (0 - 127)"""
+    self.serial.write("V"+str(speed)+" ");
+    self.cspeed = speed
+
+  def pose_get(self):
+    """Return the current angular pose"""
+    return (self.alpha, self.beta)
     
+  def time_to_reach(self, alpha, beta):
+    """Estimate the time it takes to the servos to reach
+       the target alpha,beta angles from the current position 
+       The alpha and beta are in degrees
+    """
+
+    dist = float( max(abs(alpha-self.alpha), abs(beta-self.beta)) )
+    stime = dist / (2.432 * self.cspeed)
+    print "Dist: {}".format(dist)
+    
+    #-- Return the estimated time
+    return stime
+    
+  def pose(self, alpha, beta, wait=True):
+    """Set the angles of the joints of RoboDraw (in degrees)"""
+    
+    #-- Convert into extended degrees
+    # Extended degrees are float degrees with only one decimal, multiply
+    # by 10. So that only integer numbers are used
+    # Example:  852 extende degrees (integer) means 85.2 degrees (float)
+    alpha_ext = int(round(alpha*10 ,0));
+    beta_ext =  int(round(beta*10, 0));
+    print "Pose: ({},{}) Ext. degrees".format(alpha_ext, beta_ext)
+    
+    self.serial.write("P"+str(alpha_ext)+","+str(beta_ext)+" ")
+    
+    if wait:
+      #-- Wait until the new pos is reached
+      time.sleep( self.time_to_reach(alpha,beta) )
+    
+    #-- Write the current angular pos
+    self.alpha = alpha;
+    self.beta = beta;
+
+   
+  def move(x,y):
+    """Move RoboDraw to the point p (x,y)"""
+    
+    ##-- Transform the (x,y) point into the angular space
+    q1,q2 = self.inverse_kin(x,y,decimals=1)
+    print "TODO!"
+    
+  def draw(self, l, decimals=1):
+    """Make the RoboDraw Draw the figure determined by the listo of points"""
+    
+    #-- Tranform the cartesian points into angula space
+    la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in l]
+    
+    ##-- TODO!!!!!
     
   def display_draw(self, l, decimals=1):
     """Draw the figure given by the list of points l. It is drawn

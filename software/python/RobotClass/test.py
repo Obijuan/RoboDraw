@@ -1,6 +1,7 @@
 import Robot
 import pylab
 import math
+import time
 
 def Plot_points(lp):
   """Plot a list of points. Each point is a pair (x,y)"""
@@ -84,20 +85,29 @@ def square(center, side, res):
   
 #---------------------------------------------------  
   
-pylab.ion();
+
 
 myrobot = Robot.Robot();
-
 myrobot.test();
-myrobot.kinematics(0,0);
+myrobot.connect("/dev/ttyUSB0")
+time.sleep(2);
+myrobot.pose(0,90);
+time.sleep(2);
 
-myrobot.display(40,-80);
+#pylab.ion();
 
-s = square(myrobot.center, 20, res=10)
+#myrobot.kinematics(0,0);
+
+#myrobot.display(40,-80);
+
+#s = square(myrobot.center, 20, res=10)
 
 
 ##l=division2((-50,100), (50,100), 50)
 
-Plot_points(s)
+#Plot_points(s)
 
+#myrobot.pose(0,900)
+
+#time.sleep(2);
 
