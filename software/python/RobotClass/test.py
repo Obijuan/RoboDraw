@@ -13,9 +13,12 @@ def Plot_points(lp):
   pylab.plot(x,y,"b-")
   
   #-- Superpose the points
-  pylab.plot(x,y,"go")
+  pylab.plot(x,y,"ko")
 
 def division2(p, q, res):
+  """The segment determined by the points p and q is divided into
+  smaller segments of length res. A list with all the points
+  (including p and q) is returned """
   
   #-- Maker sure all the components of p and q are float
   px=float(p[0]); py=float(p[1]);
@@ -34,7 +37,6 @@ def division2(p, q, res):
     
   print "Points: {}".format(N)
  
-  
   #-- Resolution on both axes
   xres = (q[0] - p[0])/(N+1);
   yres = (q[1] - p[1])/(N+1);
@@ -47,6 +49,38 @@ def division2(p, q, res):
   #-- Return the complete list, including p and q
   return [p] + li + [q]
   
+def division(l, res):
+  """Divide all the sergments between points into smaller segments
+  of lenth res"""
+  
+  lo = []
+  
+  for i in range(len(l)-1):
+    lo = lo + division2(l[i], l[i+1], res)
+    
+  return lo
+  
+
+def square(center, side, res):
+  """Generate a square. It returns a list of points
+     Parameters: center: (x,y) Where the center is located
+                 side:  Side length (mm)
+                 res: resolution (mm)
+  """               
+  
+  #-- The four vertex of the square
+  s = [(center[0]+side/2, center[1]+side/2),
+       (center[0]-side/2, center[1]+side/2),
+       (center[0]-side/2, center[1]-side/2),
+       (center[0]+side/2, center[1]-side/2)
+      ]
+      
+  #-- Include the first vertex at the end to close the square    
+  s = s + [s[0]]
+  
+  #-- Perform the division, acording to the resolution
+  so = division(s, res)
+  return so
   
 #---------------------------------------------------  
   
@@ -59,5 +93,11 @@ myrobot.kinematics(0,0);
 
 myrobot.display(40,-80);
 
-l=division2((-50,100), (50,100), 10)
-Plot_points(l)
+s = square(myrobot.center, 20, res=10)
+
+
+##l=division2((-50,100), (50,100), 50)
+
+Plot_points(s)
+
+
