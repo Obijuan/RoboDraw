@@ -2,6 +2,19 @@ import math
 import pylab
 import numpy as np
 
+def Plot_points(lp):
+  """Plot a list of points. Each point is a pair (x,y)"""
+  
+  #-- Get 2 lists, with the x and y coordinates of all the points
+  x = [p[0] for p in lp]
+  y = [p[1] for p in lp]
+  
+  #-- Plot as lines
+  pylab.plot(x,y,"b-")
+  
+  #-- Superpose the points
+  pylab.plot(x,y,"ko")
+
 def Trasx(x):
   """Homogeneous matrix for translation along the x axis"""
   return np.array([
@@ -33,6 +46,9 @@ class Robot:
     #-- Robot links length
     self.l1 = 73
     self.l2 = 51
+    
+    #-- Robot workspace center
+    self.center = (0,90 + (self.l1+self.l2 - 90)/2 )
     
     #-- The robot origin
     self.origin = np.array([0,0,0,1]);
@@ -112,7 +128,25 @@ class Robot:
     q2 = round(q2, decimals)
     
     #-- Return the angles
-    return q1,q2 
+    return q1,q2
+    
+    
+  def display_draw(self, l, decimals=1):
+    """Draw the figure given by the list of points l. It is drawn
+    by means of the virtual robot (applying inverse kinematics to
+    the points, and then the direct kinematics"""
+    
+    #-- Transform the cartesian points into the angular space
+    #-- by means of the inverse kinematics
+    la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in l]
+    
+    #-- Transform the angular space into cartesian again, by means
+    #-- of the direct kinematics
+    lc = [ (self.kinematics(a[0],a[1])) for a in la]
+    
+    #-- Draw the object
+    Plot_points(lc);
+    
 
   def display_xy(self, x, y, decimals=1):
     """Draw the robot from the (x,y) coordinates of the end"""
