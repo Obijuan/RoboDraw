@@ -188,22 +188,23 @@ class Robot:
     #-- Write the current angular pos
     self.alpha = alpha;
     self.beta = beta;
-
-   
-  def move(x,y):
-    """Move RoboDraw to the point p (x,y)"""
+    
+  def move(self, p):
+    """Move RoboDraw to the point p (x,y) (in mm)"""
     
     ##-- Transform the (x,y) point into the angular space
-    q1,q2 = self.inverse_kin(x,y,decimals=1)
-    print "TODO!"
+    q1,q2 = self.inverse_kin(p[0],p[1],decimals=1)
+    self.pose(q1,q2);
     
-  def draw(self, l, decimals=1):
+  def draw(self, l):
     """Make the RoboDraw Draw the figure determined by the listo of points"""
     
-    #-- Tranform the cartesian points into angula space
-    la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in l]
+    #-- Tranform the cartesian points into angular space
+    #la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in l]
     
-    ##-- TODO!!!!!
+    #-- Move to all the points in the list :-)
+    for p in l:
+      self.move(p)
     
   def display_draw(self, l, decimals=1):
     """Draw the figure given by the list of points l. It is drawn

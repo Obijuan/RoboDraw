@@ -82,23 +82,35 @@ def square(center, side, res):
   #-- Perform the division, acording to the resolution
   so = division(s, res)
   return so
+
+def line(p,q,res):
+  """Generate a line. It returns a list of points"""
+  l = [p,q]
+  
+  lo = division(l,res)
+  return lo
   
 #---------------------------------------------------  
   
 
 
-myrobot = Robot.Robot();
-myrobot.test();
-myrobot.connect("/dev/ttyUSB0")
+r = Robot.Robot();
+r.test();
+r.connect("/dev/ttyUSB0")
 time.sleep(2);
-myrobot.pose(0,90);
+r.pose(0,90);
 time.sleep(2);
 
-#pylab.ion();
+pylab.ion();
 
-#myrobot.kinematics(0,0);
+r.kinematics(0,0);
 
-#myrobot.display(40,-80);
+r.display(40,-80);
+c = r.center 
+l1 = line( (c[0]-50,c[1]), (c[0]+50,c[1]), 100)
+l2 = line( (c[0],c[1]+15), (c[0],c[1]-15), 4);
+
+Plot_points(l2)
 
 #s = square(myrobot.center, 20, res=10)
 
