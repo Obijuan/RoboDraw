@@ -3,6 +3,7 @@ import pylab
 import numpy as np
 import serial
 import time
+import Figures as fig
 
 def Plot_points(lp):
   """Plot a list of points. Each point is a pair (x,y)"""
@@ -196,24 +197,29 @@ class Robot:
     q1,q2 = self.inverse_kin(p[0],p[1],decimals=1)
     self.pose(q1,q2);
     
-  def draw(self, l):
+  def draw(self, l,res):
     """Make the RoboDraw Draw the figure determined by the listo of points"""
-    
-    #-- Tranform the cartesian points into angular space
-    #la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in l]
+
+    #-- First, the segments are "sampled", generating more points
+    #-- separated by res mm
+    ls = fig.division(l, res)
     
     #-- Move to all the points in the list :-)
-    for p in l:
+    for p in ls:
       self.move(p)
     
-  def display_draw(self, l, decimals=1):
+  def display_draw(self, l, res, decimals=1):
     """Draw the figure given by the list of points l. It is drawn
     by means of the virtual robot (applying inverse kinematics to
     the points, and then the direct kinematics"""
     
+    #-- First, the segments are "sampled", generating more points
+    #-- separated by res mm
+    ls = fig.division(l, res)
+    
     #-- Transform the cartesian points into the angular space
     #-- by means of the inverse kinematics
-    la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in l]
+    la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in ls]
     
     #-- Transform the angular space into cartesian again, by means
     #-- of the direct kinematics
