@@ -64,7 +64,11 @@ class Robot:
     self.beta = 0  #-- Joint 2
     
     #-- Set the default speed
-    self.cspeed = 50;
+    self.cspeed = 50
+    
+    #-- Constant: slowest servo angular velocity
+    #-- (servo angular velocity when speed=1)
+    self.CW=2.432
     
 
   def test(self):
@@ -163,7 +167,7 @@ class Robot:
     """
 
     dist = float( max(abs(alpha-self.alpha), abs(beta-self.beta)) )
-    stime = dist / (2.432 * self.cspeed)
+    stime = dist / (self.CW * self.cspeed)
     print "Dist: {}".format(dist)
     
     #-- Return the estimated time
