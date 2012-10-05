@@ -29,21 +29,21 @@ def division2(p, q, res):
   print "Dist: {}".format(dist);
   
   #-- Calculate the number of intermediate points
-  if res>0 and res<dist:
-    N = math.trunc(dist / float(res))-1;
+  if 0 < res < dist:
+    N = int(round(dist / float(res),0))-1;
   else:
     N=0;
     
   print "Points: {}".format(N)
  
   #-- Resolution on both axes
-  xres = (q[0] - p[0])/(N+1);
-  yres = (q[1] - p[1])/(N+1);
+  xres = (qx - px)/(N+1);
+  yres = (qy - py)/(N+1);
   
   print "xres,yres: {},{}".format(xres,yres)
  
   #-- List of intermiate points
-  li = [ (p[0]+(i+1)*xres, p[1]+(i+1)*yres)  for i in range(N)]
+  li = [ (px+(i+1)*xres, py+(i+1)*yres)  for i in range(N)]
   
   #-- Return the complete list, including p and q
   return [p] + li + [q]
