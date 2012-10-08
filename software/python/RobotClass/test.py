@@ -16,29 +16,14 @@ time.sleep(2)
 pylab.ion()
 
 
-f = open("prueba.txt")
+#-- Read the figure from a file
+a = fig.fromfile("sign027.st")
 
-#-- Read the first lines. It should contain the number of samples (lines)
-tam = int(f.readline())
+#-- Center the figure at origin (0,0)
+a.center()
 
-l = []
-
-for i in xrange(tam):
-    row = f.readline()
-    rowl = row.split()
-    l = l + [(int(rowl[0]), int(rowl[1]))]
-
-lx = np.array([p[0] for p in l])
-ly = np.array([p[1] for p in l])
-
-
-#-- Get the center
-cx = (max(lx) + min(lx)) / 2
-cy = (max(ly) + min(ly)) / 2
-
-#-- Locate the center at (0,0)
-lx = lx - cx
-ly = ly - cy
+lx = np.array(a.get_xs()) #np.array(lx) - cx
+ly = np.array(a.get_ys()) #np.array(ly) - cy
 
 #-- Flip the y axis
 ly = -ly

@@ -81,12 +81,21 @@ class Figure():
     
         return Figure(lp)
 
+    def get_xs(self):
+        """Returns a list of the x coordintes of the points"""
+        return [p[0] for p in self.lp]
+        
+    def get_ys(self):
+        """Returns a list of the y coordinates of the points"""
+        return [p[1] for p in self.lp]
+        
     def plot(self):
         """Plot the figure"""
     
         #-- Get 2 lists, with the x and y coordinates of all the points
-        x = [p[0] for p in self.lp]
-        y = [p[1] for p in self.lp]
+        #x = [p[0] for p in self.lp]
+        x = self.get_xs()
+        y = self.get_ys()
         
         #-- Plot as lines
         pylab.plot(x,y,"b-")
@@ -99,6 +108,21 @@ class Figure():
     def translate(self, tras):
         """Translate the figure"""
         self.lp = [ (p[0]+tras[0], p[1]+tras[1]) for p in self.lp ]
+        return self
+
+    def get_center(self):
+        """Get the (x,y) coordintates of the center"""
+        
+        #-------- Get the center  
+        cx = (max(self.get_xs()) + min(self.get_xs())) / 2.
+        cy = (max(self.get_ys()) + min(self.get_ys())) / 2.
+        
+        return (cx,cy)
+
+    def center(self):
+        """Translate the figure to the center"""
+        cx,cy = self.get_center()
+        self.translate((-cx,-cy))
         return self
         
         
@@ -158,5 +182,19 @@ class vgrid(Figure):
         self.lp = [(lx2[i],ly2[i]) for i in xrange(NV*2)]   
         
         
+class fromfile(Figure):
+    """A figure that is read from a file (in Sigma technologies format)"""
+    def __init__(self, filename):
+        f = open(filename)
         
+        #-- Read the first line. It should contain the number of samples (lines)
+        tam = int(f.readline())
+        l = []
         
+        ##-- Get the (x,y) points in the l list
+        for i in xrange(tam):
+            row = f.readline()
+            rowl = row.split()
+            l = l + [(int(rowl[0]), int(rowl[1]))]
+        
+        self.lp = l
