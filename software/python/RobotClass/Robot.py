@@ -5,19 +5,6 @@ import serial
 import time
 import Figures as fig
 
-def Plot_points(lp):
-  """Plot a list of points. Each point is a pair (x,y)"""
-  
-  #-- Get 2 lists, with the x and y coordinates of all the points
-  x = [p[0] for p in lp]
-  y = [p[1] for p in lp]
-  
-  #-- Plot as lines
-  pylab.plot(x,y,"b-")
-  
-  #-- Superpose the points
-  pylab.plot(x,y,"ko")
-
 def Trasx(x):
   """Homogeneous matrix for translation along the x axis"""
   return np.array([
@@ -201,36 +188,32 @@ class Robot:
     q1,q2 = self.inverse_kin(p[0],p[1],decimals=1)
     self.pose(q1,q2);
     
-  def draw(self, l,res):
+  def draw(self, figure):
     """Make the RoboDraw Draw the figure determined by the listo of points"""
-
-    #-- First, the segments are "sampled", generating more points
-    #-- separated by res mm
-    ls = fig.division(l, res)
     
     #-- Move to all the points in the list :-)
-    for p in ls:
+    for p in figure.lp:
       self.move(p)
     
-  def display_draw(self, l, res, decimals=1):
-    """Draw the figure given by the list of points l. It is drawn
+  def display_draw(self, figure, decimals=1):
+    """Draw the figure. 
+    It is drawn
     by means of the virtual robot (applying inverse kinematics to
     the points, and then the direct kinematics"""
     
-    #-- First, the segments are "sampled", generating more points
-    #-- separated by res mm
-    ls = fig.division(l, res)
-    
     #-- Transform the cartesian points into the angular space
     #-- by means of the inverse kinematics
-    la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in ls]
+    la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in figure.lp]
     
     #-- Transform the angular space into cartesian again, by means
     #-- of the direct kinematics
     lc = [ (self.kinematics(a[0],a[1])) for a in la]
     
-    #-- Draw the object
-    Plot_points(lc);
+    #-- Create a new figure
+    new_fig = fig.Figure(lc)
+    
+    #-- Plot!
+    new_fig.plot()
     
 
   def display_xy(self, x, y, decimals=1):
@@ -257,9 +240,6 @@ class Robot:
     ##-- Get the x,y coordinates of all the origins, for plotting
     l1_x = [self.origin[X], O1[X], O2[X]];
     l1_y = [self.origin[Y], O1[Y], O2[Y]];
-    
-    
-    pylab.hold(False);
     
     #-- Draw the links 1 and 2
     pylab.plot(l1_x, l1_y, "b-", linewidth=5);
