@@ -72,7 +72,8 @@ class Figure():
     
     def divide(self, res):
         """Divide all the sergments between points into smaller segments
-        of lenth res"""
+        of lenth res. It does not change the current figure, just returns
+        a new one"""
         
         lp = []
         for i in range(len(self.lp)-1):
@@ -95,6 +96,11 @@ class Figure():
         #-- Superpose the points
         pylab.plot(x,y,"ko")
         
+    def translate(self, tras):
+        """Translate the figure"""
+        self.lp = [ (p[0]+tras[0], p[1]+tras[1]) for p in self.lp ]
+        return self
+        
         
 class line(Figure):
     """ Generate a line. It is given by 2 points"""
@@ -105,5 +111,8 @@ class line(Figure):
         self.lp = [p,q]
         
         
-  
+class lineh(Figure):
+    """Horizontal line"""
+    def __init__(self, length):
+        self.lp = [(-length/2,0), (length/2,0)]
   
