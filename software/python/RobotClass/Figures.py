@@ -121,4 +121,15 @@ class linev(Figure):
     def __init__(self, length):
         self.lp = [(0,length/2), (0,-length/2)]
         
+class box(Figure):
+    """A rectangle center in the origin"""
+    def __init__(self, lx, ly):
+        
+       self.lp = [
+           (lx/2,  ly/2),
+           (-lx/2, ly/2),
+           (-lx/2, -ly/2),
+           (lx/2,  -ly/2),
+           (lx/2,  ly/2) ]
+           
         
