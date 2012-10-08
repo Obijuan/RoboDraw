@@ -116,3 +116,9 @@ class lineh(Figure):
     def __init__(self, length):
         self.lp = [(-length/2,0), (length/2,0)]
   
+class linev(Figure):
+    """Vertical line"""
+    def __init__(self, length):
+        self.lp = [(0,length/2), (0,-length/2)]
+        
+        
