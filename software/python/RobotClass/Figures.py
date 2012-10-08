@@ -132,4 +132,31 @@ class box(Figure):
            (lx/2,  -ly/2),
            (lx/2,  ly/2) ]
            
+class vgrid(Figure):
+    """A vertical grid (for testing)"""
+    
+    def __init__(self, x, y, NV):
+        """x,y: box dimensions. NV= number of vertical lines"""
+        
+        ##-- List of x points
+        xini = -x/2.             #-- Initial x point
+        xinc = x / float(NV)     #-- Distance between vertical lines
+        lx = [xini + i*xinc for i in xrange(NV)]
+        ly = [(-1)**i*y/2. for i in xrange(NV)]
+        
+        ##-- Duplicate the x coordinates
+        lx2 = []
+        for px in lx:
+            lx2.extend([px,px])
+        lx2
+        
+        #-- Duplicate the y coordinates
+        ly2 = [-y/2.]
+        for py in ly:
+            ly2.extend([py,py])
+           
+        self.lp = [(lx2[i],ly2[i]) for i in xrange(NV*2)]   
+        
+        
+        
         
