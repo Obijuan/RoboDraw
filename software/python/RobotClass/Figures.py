@@ -76,7 +76,7 @@ class Figure():
         
         lp = []
         for i in range(len(self.lp)-1):
-            lp = lp + self._division2(self.lp[i], self.lp[i+1], res)
+            lp.extend(self._division2(self.lp[i], self.lp[i+1], res))
     
         return Figure(lp)
 
