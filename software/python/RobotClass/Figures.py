@@ -176,6 +176,22 @@ class Figure():
         
         return self
 
+    def save_st(self, filename):
+        """Save the figure as Sigma technology format"""
+        print "Save as: {}".format(filename)
+        
+        f = open(filename,"w")
+        
+        #-- Write the number of points
+        f.write(str(len(self.lp))+'\n')
+        
+        #-- Write all the points
+        for p in self.lp:
+            f.write("{0:d} {1:d} -1000 500\n".format(int(round(p[0],0)),
+                                                     int(round(p[1],0))) )  
+        
+        f.close()
+        
 class line(Figure):
     """ Generate a line. It is given by 2 points"""
     def __init__(self, p, q):

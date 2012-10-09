@@ -33,6 +33,23 @@ def test_figure(filename, lenx, robot):
       
     return f
 
+def test_save_st(filename):
+    """Save a figure to the st format. Read it and display to
+    test if the save_st method works"""
+    
+    #-- Create a box
+    a = fig.box(40,20).translate(r.center)
+    
+    #-- Subdivide into smaller points
+    a = a.divide(5)
+    a.plot()
+    
+    #--- Save the figure as a file
+    a.save_st(filename)
+    
+    #-- Read the file
+    b = fig.fromfile(filename)
+    b.plot(True)
     
 #------- Main     
     
@@ -43,11 +60,14 @@ time.sleep(2)
 
 pylab.ion()
 
+test_save_st("test.st")
+
+
 #-- Read the figure from a file
-a = test_figure("test.st", 40, r)
+#a = test_figure("test.st", 40, r)
 
 #-- Plot the figure
-a.plot()
+#a.plot()
 
 
 c = r.center
