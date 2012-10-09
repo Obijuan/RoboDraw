@@ -124,7 +124,27 @@ class Figure():
         cx,cy = self.get_center()
         self.translate((-cx,-cy))
         return self
+
+    def get_size(self):
+        """Get the figure size"""
         
+        w = float(max(self.get_xs()) - min(self.get_ys()))
+        h = float(max(self.get_ys()) - min(self.get_ys()))
+        
+        return (w,h)
+        
+    def flipy(self):
+        """Flip the figure around y axis"""
+        
+        self.lp = [(p[0], -p[1]) for p in self.lp]
+        
+        return self
+        
+    def flipx(self):
+        """Flip the figure around x axis"""
+        self.lp = [(-p[0], p[1]) for p in self.lp]
+         
+        return self
         
 class line(Figure):
     """ Generate a line. It is given by 2 points"""

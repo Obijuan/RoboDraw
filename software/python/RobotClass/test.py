@@ -16,31 +16,38 @@ time.sleep(2)
 pylab.ion()
 
 
+##-- TODO:
+#-- Implement the flipx and flipy methods
+#-- Implement the get_size() method
+#-- Implement the scale() method
+
 #-- Read the figure from a file
-a = fig.fromfile("sign027.st")
+a = fig.fromfile("test.st")
 
 #-- Center the figure at origin (0,0)
 a.center()
 
-lx = np.array(a.get_xs()) #np.array(lx) - cx
-ly = np.array(a.get_ys()) #np.array(ly) - cy
-
 #-- Flip the y axis
-ly = -ly
+a.flipy()
 
-#-- Get the height and width of the sign
-w = float(max(lx) - min(lx))
-h = float(max(ly) - min(ly))
+#-- Get the height and width of the figure
+w,h = a.get_size();
 
 #-- Robot printing area (where the sign will be printed)
 Rx = 45.
 Ry = (h / w) * Rx
+
+lx = np.array(a.get_xs()) #np.array(lx) - cx
+ly = np.array(a.get_ys()) #np.array(ly) - cy
+
+
 
 #-- Scale the sign to fit on the robot printing area. Traslate it
 #-- to the robot origin
 lx = lx * Rx / w + r.center[0]
 ly = ly * Ry / h + r.center[1]
 
+#a.translate(r.center)
 
 pylab.plot(lx, ly, "b-")
 #pylab.plot(lx, ly, "ko")
