@@ -8,6 +8,34 @@ import time
 import Figures as fig
 import numpy as np
 
+def test_figure(filename, lenx, robot):
+    """Read a figure from a file and apply transformation so that
+    it can be printed on the robot
+    Parameters:
+      -filename: The file in ST format
+      -lenx: Scale the figure so that the width is equal to lenx
+      -robot: The robot"""
+      
+    #-- Read the figure from a file
+    f = fig.fromfile(filename)
+    
+    #-- Center the figure at origin (0,0)
+    f.center()
+
+    #-- Flip the y axis
+    f.flipy()
+
+    #-- Scale the figure so that it fits the robot printing area
+    f.scale_fitx(lenx)
+
+    #-- Translate the figure to the robot printing origin
+    f.translate(robot.center)  
+      
+    return f
+
+    
+#------- Main     
+    
 r = Robot.Robot()
 r.test()
 r.connect("/dev/ttyUSB0")
@@ -15,27 +43,8 @@ time.sleep(2)
 
 pylab.ion()
 
-
-##-- TODO:
-#-- Implement the flipx and flipy methods
-#-- Implement the get_size() method
-#-- Implement the scale() method
-
 #-- Read the figure from a file
-a = fig.fromfile("test.st")
-
-#-- Center the figure at origin (0,0)
-a.center()
-
-#-- Flip the y axis
-a.flipy()
-
-#-- Scale the figure so that it fits the robot printing area
-Rx = 45.
-a.scale_fitx(Rx)
-
-#-- Translate the figure to the robot printing origin
-a.translate(r.center)
+a = test_figure("test.st", 40, r)
 
 #-- Plot the figure
 a.plot()
@@ -44,6 +53,7 @@ a.plot()
 c = r.center
 r.display_xy(c[0], c[1])
 r.move(c)
+#r.draw(a)
 
 
 
