@@ -51,6 +51,20 @@ def test_save_st(filename):
     b = fig.fromfile(filename)
     b.plot(True)
     
+def test_save_c(filename, r, tablename="data",comments="//-- Figure (ext. degrees)"):
+    """Save the figure as a c-table for including into the 
+    arduino files"""
+    
+    #-- Create a box
+    a = fig.box(40,20).translate(r.center)
+    
+    #-- Subdivide into smaller points
+    a = a.divide(5)
+    a.plot()
+    
+    #--- Save the figure as a file
+    a.save_c(filename,r,"data","//-- a Box. Resolution 5")
+    
 #------- Main     
     
 r = Robot.Robot()
@@ -60,8 +74,8 @@ time.sleep(2)
 
 pylab.ion()
 
-test_save_st("test.st")
-
+#test_save_st("test.st")
+test_save_c("test.h",r)
 
 #-- Read the figure from a file
 #a = test_figure("test.st", 40, r)

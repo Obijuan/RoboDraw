@@ -192,6 +192,44 @@ class Figure():
         
         f.close()
         
+    def save_c(self, filename, robot, table, comments=""):
+        """Save the figure as a C-table file for inserting into
+        the arduino programs.
+        Parameters:
+          -filename: the file name (ej. data.h)
+          -Robot: The robot to use for printing. It is necessary in
+                  order to calculate the inverse kinematics
+          -table: The C name to give to the table
+          -comments: Some C comments about the data
+        The points are saved as angles (in ext. degrees)
+        the first one for the arm, the second for the forearm
+        """
+        print "Save in C. File: {}".format(filename)
+        print "For robot: "
+        robot.test()
+        
+        #-- Transform the cartesian points into the angular space
+        #-- by means of the inverse kinematics
+        la=[ robot.inverse_kin(p[0],p[1],decimals=1) for p in self.lp]
+        
+        #-- Convert into ext. degrees
+        la = [ (int(p[0]*10), int(p[1]*10)) for p in la]
+        
+        f = open(filename,"w")
+        f.write(comments+"\n")
+        f.write("int {}[][2]=".format(table))
+        f.write("{\n")
+        
+        for p in la:
+            f.write("{")
+            f.write("{},{}".format(p[0],p[1]))
+            f.write("},\n")
+        
+        f.write("};\n")
+        f.close()
+        
+        
+        
 class line(Figure):
     """ Generate a line. It is given by 2 points"""
     def __init__(self, p, q):
