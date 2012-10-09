@@ -30,37 +30,19 @@ a.center()
 #-- Flip the y axis
 a.flipy()
 
-#-- Get the height and width of the figure
-w,h = a.get_size();
-
-#-- Robot printing area (where the sign will be printed)
+#-- Scale the figure so that it fits the robot printing area
 Rx = 45.
-Ry = (h / w) * Rx
+a.scale_fitx(Rx)
 
-lx = np.array(a.get_xs()) #np.array(lx) - cx
-ly = np.array(a.get_ys()) #np.array(ly) - cy
+#-- Translate the figure to the robot printing origin
+a.translate(r.center)
 
+#-- Plot the figure
+a.plot()
 
-
-#-- Scale the sign to fit on the robot printing area. Traslate it
-#-- to the robot origin
-lx = lx * Rx / w + r.center[0]
-ly = ly * Ry / h + r.center[1]
-
-#a.translate(r.center)
-
-pylab.plot(lx, ly, "b-")
-#pylab.plot(lx, ly, "ko")
 
 c = r.center
-r.display_xy(lx[0], ly[0])
-
-
-#-- Build the new list of points
-l = [(lx[i], ly[i]) for i in range(len(lx))]
-
-f = fig.Figure(l)
-
+r.display_xy(c[0], c[1])
 r.move(c)
 
 

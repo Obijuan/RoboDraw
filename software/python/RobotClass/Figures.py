@@ -89,8 +89,9 @@ class Figure():
         """Returns a list of the y coordinates of the points"""
         return [p[1] for p in self.lp]
         
-    def plot(self):
-        """Plot the figure"""
+    def plot(self, points=False):
+        """Plot the figure. If points is True, the figure along 
+        with its points are shown"""
     
         #-- Get 2 lists, with the x and y coordinates of all the points
         #x = [p[0] for p in self.lp]
@@ -100,10 +101,11 @@ class Figure():
         #-- Plot as lines
         pylab.plot(x,y,"b-")
         
-        pylab.hold(True)
+        if points==True:
+            pylab.hold(True)
         
-        #-- Superpose the points
-        pylab.plot(x,y,"ko")
+            #-- Superpose the points
+            pylab.plot(x,y,"ko")
         
     def translate(self, tras):
         """Translate the figure"""
@@ -146,6 +148,34 @@ class Figure():
          
         return self
         
+    def scale_fitx(self, x):
+        """Scale the figure so that the size along x axis is equal to x"""
+        
+        #--- Get the figure size
+        w,h = self.get_size()
+        
+        #--- Calculate the y size
+        y = x * (h / w)
+        
+        #-- Re-scale the points
+        self.lp = [ (p[0] * x / w, p[1] * y / h) for p in self.lp ]
+        
+        return self
+
+    def scale_fity(self, y):
+        """Scale the figure so that the size along y axis is equal to y"""
+        
+        #--- Get the figure size
+        w,h = self.get_size()
+        
+        #--- Calculate the x size
+        x = y * (w / h)
+        
+        #-- Re-scale the points
+        self.lp = [ (p[0] * x / w, p[1] * y / h) for p in self.lp ]
+        
+        return self
+
 class line(Figure):
     """ Generate a line. It is given by 2 points"""
     def __init__(self, p, q):
