@@ -26,8 +26,6 @@ class Figure():
     def __init__(self, lp):
         """Create a new figure from a list of points"""
         
-        print "Figure: init!"
-        
         #-- Just copy the list of points
         self.lp = lp
         
@@ -47,7 +45,7 @@ class Figure():
         #-- Calculate the distance between p and q 
         dist = math.sqrt( (px-qx)**2 + (py-qy)**2 );
         
-        print "Dist: {}".format(dist);
+        #print "Dist: {}".format(dist);
         
         #-- Calculate the number of intermediate points
         if 0 < res < dist:
@@ -55,13 +53,13 @@ class Figure():
         else:
             N=0;
             
-        print "Points: {}".format(N)
+        #print "Points: {}".format(N)
         
         #-- Resolution on both axes
         xres = (qx - px)/(N+1);
         yres = (qy - py)/(N+1);
   
-        print "xres,yres: {},{}".format(xres,yres)
+        #print "xres,yres: {},{}".format(xres,yres)
         
         #-- List of intermiate points
         li = [ (px+(i+1)*xres, py+(i+1)*yres)  for i in range(N)]
@@ -79,7 +77,11 @@ class Figure():
         for i in range(len(self.lp)-1):
             lp.extend(self._division2(self.lp[i], self.lp[i+1], res))
     
-        return Figure(lp)
+        #--- Remove doble points
+        b = [lp[i] for i in range(len(lp)-1) if lp[i]!=lp[i+1]]
+        b.append(lp[len(lp)-1])  #-- Add the last point
+    
+        return Figure(b)
 
     def get_xs(self):
         """Returns a list of the x coordintes of the points"""
@@ -130,7 +132,7 @@ class Figure():
     def get_size(self):
         """Get the figure size"""
         
-        w = float(max(self.get_xs()) - min(self.get_ys()))
+        w = float(max(self.get_xs()) - min(self.get_xs()))
         h = float(max(self.get_ys()) - min(self.get_ys()))
         
         return (w,h)
@@ -148,17 +150,20 @@ class Figure():
          
         return self
         
+    def scale(self, sf):
+        """Scale the figure by the given scale factor sf"""
+        
+        #-- Calculate the scaled points
+        self.lp = [ (p[0] * sf, sf * p[1]) for p in self.lp ]
+        return self
+        
     def scale_fitx(self, x):
         """Scale the figure so that the size along x axis is equal to x"""
         
         #--- Get the figure size
         w,h = self.get_size()
         
-        #--- Calculate the y size
-        y = x * (h / w)
-        
-        #-- Re-scale the points
-        self.lp = [ (p[0] * x / w, p[1] * y / h) for p in self.lp ]
+        self.scale(x / w)
         
         return self
 
@@ -168,11 +173,7 @@ class Figure():
         #--- Get the figure size
         w,h = self.get_size()
         
-        #--- Calculate the x size
-        x = y * (w / h)
-        
-        #-- Re-scale the points
-        self.lp = [ (p[0] * x / w, p[1] * y / h) for p in self.lp ]
+        self.scale(y / h )
         
         return self
 
@@ -192,7 +193,7 @@ class Figure():
         
         f.close()
         
-    def save_c(self, filename, robot, table, comments=""):
+    def save_c(self, filename, robot, table, comments="", ares=5):
         """Save the figure as a C-table file for inserting into
         the arduino programs.
         Parameters:
@@ -212,28 +213,48 @@ class Figure():
         #-- by means of the inverse kinematics
         la=[ robot.inverse_kin(p[0],p[1],decimals=1) for p in self.lp]
         
+        #-- Perform the sampling in the angular space
+        la = Figure(la).divide(ares).lp
+        
         #-- Convert into ext. degrees
         la = [ (int(p[0]*10), int(p[1]*10)) for p in la]
+        
+        for a in la:
+            print "({0},{1})".format(a[0]/10., a[1]/10.)
+        
+        #-- Transform the sampled points into cartesian points
+        #-- This is for return the user the actual figure that
+        #-- the robot will draw
+        lp2 = [(robot.kinematics(a[0]/10.,a[1]/10.)) for a in la]
         
         f = open(filename,"w")
         f.write(comments+"\n")
         f.write("int {}[][2]=".format(table))
         f.write("{\n")
         
+        
+        #-- Write the angular points
+        #-- WARNING! The absolute direction of rotation depend on the
+        #-- the servo. In some servos, a positive value means rotation clockwise
+        #-- but in other anticlockwise
         for p in la:
             f.write("{")
-            f.write("{},{}".format(p[0],p[1]))
+            #-- For SANWA servos, the angle should be changed
+            #-- For Futaba, they should not be inverted
+            f.write("{},{}".format(-p[0], -p[1]))
             f.write("},\n")
         
         f.write("};\n")
         f.close()
         
+        #-- Return the actual figure that will be drawn
+        return Figure(lp2)
         
         
 class line(Figure):
     """ Generate a line. It is given by 2 points"""
     def __init__(self, p, q):
-        print "Line!"
+        #print "Line!"
         
         #-- List of points
         self.lp = [p,q]
