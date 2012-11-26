@@ -32,13 +32,14 @@ def Rotz(ang):
 ##--------------------------------------------------------------------------    
 class Robot:
   
-  def __init__(self):
+  def __init__(self, l1 = 73, l2 = 51):
     #-- Robot links length
-    self.l1 = 73
-    self.l2 = 51
+    self.l1 = l1
+    self.l2 = l2
     
     #-- Robot workspace center
-    self.center = (0,90 + (self.l1+self.l2 - 90)/2 )
+    #self.center = (0, 90 + (self.l1+self.l2 - 90)/2 )
+    self.center = (0,  (math.sqrt(self.l1 ** 2 + self.l2 ** 2) + (self.l1 + self.l2))/2)
     
     #-- The robot origin
     self.origin = np.array([0,0,0,1]);
@@ -51,12 +52,16 @@ class Robot:
     self.beta = 0  #-- Joint 2
     
     #-- Set the default speed
-    self.cspeed = 50
+    self.cspeed = 100
     
     #-- Constant: slowest servo angular velocity
     #-- (servo angular velocity when speed=1)
-    self.CW=2.432
+    #self.CW=2.432 #-- Initial value
+    self.CW=.3 #-- Calculated empirically for speed=10
     
+    #-- Constant for the wrist going up/down (in degrees)
+    self.up = -20
+    self.down = 1
 
   def test(self):
     print "Scara robot: l1 = {} mm, l2 = {} mm".format(self.l1,self.l2)
@@ -155,7 +160,7 @@ class Robot:
 
     dist = float( max(abs(alpha-self.alpha), abs(beta-self.beta)) )
     stime = dist / (self.CW * self.cspeed)
-    print "Dist: {}".format(dist)
+    #print "Dist: {0}, time: {1}".format(dist,stime)
     
     #-- Return the estimated time
     return stime
@@ -169,7 +174,7 @@ class Robot:
     # Example:  852 extende degrees (integer) means 85.2 degrees (float)
     alpha_ext = int(round(alpha*10 ,0));
     beta_ext =  int(round(beta*10, 0));
-    print "Pose: ({},{}) Ext. degrees".format(alpha_ext, beta_ext)
+    #print "Pose: ({},{}) Ext. degrees".format(alpha_ext, beta_ext)
     
     self.serial.write("P"+str(alpha_ext)+","+str(beta_ext)+" ")
     
@@ -186,16 +191,49 @@ class Robot:
     
     ##-- Transform the (x,y) point into the angular space
     q1,q2 = self.inverse_kin(p[0],p[1],decimals=1)
-    self.pose(q1,q2);
+    self.pose(q1,q2)
     
-  def draw(self, figure):
-    """Make the RoboDraw Draw the figure determined by the listo of points"""
+  def pen_down(self):
+      
+      #-- Create the frame to send to the firmware
+      cad = "C{0} ".format(self.down*10)
+      self.serial.write(cad)
+      
+  def pen_up(self):
+      
+      cad = "C{0} ".format(self.up*10)
+      self.serial.write(cad)
     
-    #-- Move to all the points in the list :-)
-    for p in figure.lp:
-      self.move(p)
+  def draw(self, figure, ares=0):
+    """Make the RoboDraw Draw the figure determined by the list of points"""
     
-  def display_draw(self, figure, decimals=1):
+    #-- Transform the cartesian points into the angular space
+    #-- by means of the inverse kinematics
+    la=[ ( self.inverse_kin(p[0],p[1],1) ) for p in figure.lp]
+    
+    #-- Perform the sampling in the angular space
+    angular_fig = fig.Figure(la).divide(ares)
+    
+    #-- Move the pencil up
+    self.pen_up()
+    time.sleep(0.400)
+    
+    #-- Move to the first position
+    self.pose(angular_fig.lp[0][0], angular_fig.lp[0][1])
+    
+    #-- Move down the pencil
+    self.pen_down()
+    time.sleep(0.400)
+    
+    #-- Send the positions to the robot!
+    for alpha,beta in angular_fig.lp:
+        self.pose(alpha,beta)
+        #time.sleep(0.1)  #-- extra time
+    
+    #-- Move the pencil up
+    self.pen_up()
+    
+  def display_draw(self, figure, decimals=1, ares=0, display_points=False):
     """Draw the figure. 
     It is drawn
     by means of the virtual robot (applying inverse kinematics to
@@ -205,15 +243,18 @@ class Robot:
     #-- by means of the inverse kinematics
     la=[ ( self.inverse_kin(p[0],p[1],decimals) ) for p in figure.lp]
     
+    #-- Perform the sampling in the angular space
+    angular_fig = fig.Figure(la).divide(ares)
+    
     #-- Transform the angular space into cartesian again, by means
     #-- of the direct kinematics
-    lc = [ (self.kinematics(a[0],a[1])) for a in la]
+    lc = [ (self.kinematics(a[0],a[1])) for a in angular_fig.lp]
     
     #-- Create a new figure
     new_fig = fig.Figure(lc)
     
     #-- Plot!
-    new_fig.plot()
+    new_fig.plot(display_points)
     
 
   def display_xy(self, x, y, decimals=1):
